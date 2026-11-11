@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block title %}{{ 'Create account' if mode=='register' else 'Login' }}{% endblock %}
+{% block content %}<div class="auth-wrap"><div class="auth-card"><div class="eyebrow">INTERVIEWAI PORTAL</div><h2 class="mb-4">{{ 'Create your account' if mode=='register' else 'Welcome back' }}</h2>
+<form method="post">
+{% if mode=='register' %}
+<label class="form-label">Full name</label><input class="form-control mb-3" name="name" required>
+<label class="form-label">Phone number</label><input class="form-control mb-3" name="phone">
+<label class="form-label">College / Institution</label><input class="form-control mb-3" name="college">
+<label class="form-label">Qualification</label><input class="form-control mb-3" name="qualification" placeholder="e.g. B.E. Computer Science">
+{% endif %}
+<label class="form-label">Email address</label><input class="form-control mb-3" type="email" name="email" required>
+<label class="form-label">Password</label><input class="form-control mb-4" type="password" name="password" minlength="8" required>
+<button class="btn btn-primary w-100">{{ 'Create account' if mode=='register' else 'Login' }}</button></form>
+<p class="text-muted mt-3 mb-0">{% if mode=='register' %}Already registered? <a href="{{ url_for('login') }}">Login</a>{% else %}New here? <a href="{{ url_for('register') }}">Create an account</a>{% endif %}</p>
+</div></div>{% endblock %}

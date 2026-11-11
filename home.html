@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block title %}AI Interview Practice Portal{% endblock %}
+{% block content %}<section class="hero p-4 p-lg-5 rounded-4"><div class="row align-items-center"><div class="col-lg-7">
+<div class="eyebrow">YOUR PERSONAL AI INTERVIEW COACH</div><h1 class="display-5 fw-bold mt-3">Practise smarter.<br><span class="gold-text">Interview with confidence.</span></h1>
+<p class="lead mt-3">Prepare with resume-aware questions across technical, HR, behavioral and situational interviews. Learn from every attempt.</p>
+<div class="d-flex flex-wrap gap-2 mt-4"><a class="btn btn-gold btn-lg" href="{{ url_for('register') }}">Get started</a><a class="btn btn-outline-light btn-lg" href="{{ url_for('login') }}">Sign in</a></div></div>
+<div class="col-lg-5 mt-4 mt-lg-0"><div class="hero-panel"><div class="avatar">AI</div><h4>Virtual Interview Coach</h4><p class="mb-0">Personalized practice · Actionable feedback · Measurable progress</p></div></div></div></section>
+<div class="row g-3 mt-3">{% for icon,title,desc in [('▤','Resume builder','Create or upload your resume.'),('✦','Dynamic questions','Practise varied interview questions.'),('◷','Interview reports','Review feedback and track improvement.') ] %}
+<div class="col-md-4"><div class="feature-card h-100"><div class="feature-icon">{{ icon }}</div><h5>{{ title }}</h5><p class="text-muted mb-0">{{ desc }}</p></div></div>{% endfor %}</div>{% endblock %}

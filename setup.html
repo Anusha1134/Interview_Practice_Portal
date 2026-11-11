@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block title %}Interview setup{% endblock %}
+{% block content %}<div class="eyebrow">NEW PRACTICE SESSION</div><h2>Set up your interview</h2><p class="text-muted">The session contains a mix of technical, HR, behavioral, situational and communication questions.</p>
+{% if resume %}<div class="alert alert-success">Resume profile found. Your interview can use its skills and project details.</div>{% else %}<div class="alert alert-warning">Please add a resume first. <a href="{{ url_for('resume') }}">Open resume builder</a>.</div>{% endif %}
+<div class="content-card form-narrow"><form method="post"><label class="form-label">Choose your domain</label><select class="form-select mb-3" name="domain">{% for d in domains %}<option>{{ d }}</option>{% endfor %}</select>
+<label class="form-label">Difficulty</label><select class="form-select mb-3" name="difficulty">{% for d in difficulties %}<option>{{ d }}</option>{% endfor %}</select>
+<label class="form-label">Interview mode</label><select class="form-select mb-3" name="mode"><option>Text</option><option>Voice + Text</option><option>Camera + Voice</option></select>
+<label class="form-label">Number of questions</label><select class="form-select mb-4" name="question_count"><option value="5">5 questions · Quick practice</option><option value="10" selected>10 questions · Standard</option><option value="15">15 questions · Extended</option><option value="20">20 questions · Full mock interview</option></select>
+<button class="btn btn-gold w-100" {% if not resume %}disabled{% endif %}>Start interview</button></form></div>{% endblock %}

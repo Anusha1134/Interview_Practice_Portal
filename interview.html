@@ -1,0 +1,35 @@
+{% extends "base.html" %}{% block title %}Interview session{% endblock %}
+{% block content %}<div class="d-flex justify-content-between align-items-center"><div><div class="eyebrow">{{ interview_row['domain'] }} · {{ interview_row['difficulty'] }}</div><h2>Interview in progress</h2></div><span class="badge rounded-pill text-bg-primary">Question {{ number }} / {{ total_questions }}</span></div>
+<div class="row g-4 mt-1"><div class="col-lg-8"><div class="content-card"><div class="d-flex justify-content-between"><span class="badge text-bg-light">{{ category }}</span><span class="text-muted small">AI Interviewer</span></div><div class="progress mt-3" style="height:7px"><div class="progress-bar" style="width:{{ (number / total_questions * 100)|round }}%"></div></div><div class="question-text mt-3" id="question">{{ question }}</div>
+<label class="form-label mt-4">Your answer</label><textarea id="answer" class="form-control answer-box" placeholder="Type your answer here, or use voice input..."></textarea>
+<div class="d-flex flex-wrap gap-2 mt-3"><button class="btn btn-outline-primary" id="speakBtn" type="button">🔊 Read question</button><button class="btn btn-outline-primary" id="voiceBtn" type="button">🎙 Voice input</button><button class="btn btn-primary ms-auto" id="submitBtn" type="button">Submit answer</button></div>
+<div id="evaluation" class="mt-4" hidden></div></div></div>
+<div class="col-lg-4"><div class="content-card"><h5>Virtual interviewer</h5><div class="avatar-stage"><div class="avatar talking" id="avatar">AI</div><p class="mb-0">Interview Coach</p><small class="text-muted">Animated placeholder avatar</small></div><hr><h6>Camera preview (optional)</h6><video id="camera" autoplay muted playsinline class="camera-preview"></video><button class="btn btn-sm btn-outline-secondary w-100 mt-2" id="cameraBtn" type="button">Enable camera preview</button><small class="text-muted d-block mt-2">This starter only displays the camera feed. It does not assess facial emotion or personality.</small></div></div></div>
+{% endblock %}
+{% block scripts %}<script>
+const question = document.getElementById('question').innerText;
+const category = {{ category|tojson }};
+const submitBtn = document.getElementById('submitBtn');
+document.getElementById('speakBtn').onclick = () => { if ('speechSynthesis' in window) { speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(question)); } else alert('Speech output is not supported in this browser.'); };
+document.getElementById('voiceBtn').onclick = () => {
+ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+ if (!SR) { alert('Speech recognition is not supported in this browser. Try a supported browser.'); return; }
+ const rec = new SR(); rec.lang='en-IN'; rec.interimResults=true; rec.onresult=e=>{document.getElementById('answer').value=Array.from(e.results).map(x=>x[0].transcript).join(' ');}; rec.start();
+};
+document.getElementById('cameraBtn').onclick = async () => {
+ try { const stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false}); document.getElementById('camera').srcObject=stream; }
+ catch(e) { alert('Camera permission was not granted or no camera is available.'); }
+};
+submitBtn.onclick = async () => {
+ const answer=document.getElementById('answer').value.trim();
+ if(!answer){alert('Please enter or dictate an answer first.');return;}
+ submitBtn.disabled=true; submitBtn.textContent='Evaluating...';
+ try {
+  const res=await fetch('{{ url_for("submit_answer") }}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,answer,category})});
+  const data=await res.json(); if(!res.ok) throw new Error(data.error||'Could not submit answer');
+  const e=data.evaluation, box=document.getElementById('evaluation'); box.hidden=false;
+  box.innerHTML=`<div class="alert alert-info"><strong>Answer score: ${e.score}/100</strong><p>${e.feedback}</p><strong>Strengths</strong><ul>${e.strengths.map(x=>`<li>${x}</li>`).join('')}</ul><strong>Improvements</strong><ul>${e.improvements.map(x=>`<li>${x}</li>`).join('')}</ul><strong>Suggested answer structure</strong><p>${e.sample_answer}</p></div><a class="btn btn-gold" href="${data.next_url}">${data.next_url.includes('/result')?'View final report':'Next question'}</a>`;
+  document.getElementById('answer').disabled=true; submitBtn.hidden=true;
+ } catch(err){alert(err.message);submitBtn.disabled=false;submitBtn.textContent='Submit answer';}
+};
+</script>{% endblock %}
